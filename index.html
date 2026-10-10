@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Matematik Tahun 2 KSSR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F0FDF4;
+            color: #1F2937;
+            user-select: none;
+            -webkit-user-select: none;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, .font-kids {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .btn-pop {
+            transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s;
+        }
+        .btn-pop:active {
+            transform: scale(0.95);
+        }
+
+        #drawing-canvas {
+            touch-action: none;
+            background-color: white;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            width: 100%;
+            height: 200px; /* Saiz mesra scroll diubah seperti diminta */
+            cursor: crosshair;
+        }
+
+        .hide { display: none !important; }
+        
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+        }
+        .fraction span:first-child { border-bottom: 2px solid currentColor; padding: 0 2px; }
+        .fraction span:last-child { padding: 0 2px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative">
+
+    <nav class="bg-white shadow-md p-4 sticky top-0 z-50 flex justify-between items-center rounded-b-2xl border-b-4 border-green-500">
+        <div class="flex items-center gap-3">
+            <div class="bg-green-100 p-2 rounded-full text-2xl shadow-sm">🦉</div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-green-600 font-kids leading-tight">Matematik KSSR</h1>
+                <p class="text-xs text-gray-500 font-bold">Tahun 2 (Jilid 1 & 2)</p>
+            </div>
+        </div>
+        <button onclick="nav.goHome()" class="btn-pop bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl font-bold shadow-sm flex items-center gap-2">
+            🏠 <span class="hidden md:inline">Menu Utama</span>
+        </button>
+    </nav>
+
+    <main id="screen-main" class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col justify-center items-center gap-6 py-8">
+        <h2 class="text-3xl md:text-4xl font-bold text-center text-indigo-600 font-kids mb-4 animate-float">Pilih Modul Pembelajaran</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <button onclick="nav.showVolume(1)" class="btn-pop bg-gradient-to-br from-blue-400 to-blue-600 p-6 rounded-3xl shadow-lg border-b-8 border-blue-700 flex flex-col items-center justify-center gap-3 text-white relative overflow-hidden">
+                <span class="text-5xl z-10">📘</span>
+                <span class="text-2xl font-bold font-kids z-10">Buku Jilid 1</span>
+                <span class="text-sm opacity-90 z-10 text-center">Nombor, Tambah, Tolak, Darab, Bahagi</span>
+                <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+            </button>
+            
+            <button onclick="nav.showVolume(2)" class="btn-pop bg-gradient-to-br from-pink-400 to-pink-600 p-6 rounded-3xl shadow-lg border-b-8 border-pink-700 flex flex-col items-center justify-center gap-3 text-white relative overflow-hidden">
+                <span class="text-5xl z-10">📙</span>
+                <span class="text-2xl font-bold font-kids z-10">Buku Jilid 2</span>
+                <span class="text-sm opacity-90 z-10 text-center">Pecahan, Wang, Masa, Ukuran, Bentuk, Data</span>
+                <div class="absolute -left-4 -top-4 w-24 h-24 bg-white opacity-10 rounded-full"></div>
+            </button>
+            
+            <button onclick="nav.showExams()" class="btn-pop bg-gradient-to-br from-purple-400 to-purple-600 p-6 rounded-3xl shadow-lg border-b-8 border-purple-700 flex flex-col items-center justify-center gap-3 text-white">
+                <span class="text-5xl">📝</span>
+                <span class="text-2xl font-bold font-kids">Peperiksaan</span>
+                <span class="text-sm opacity-90 text-center">Uji Minda Set 1 & Set 2 (30 Soalan)</span>
+            </button>
+            
+            <button onclick="nav.showGames()" class="btn-pop bg-gradient-to-br from-yellow-400 to-yellow-500 p-6 rounded-3xl shadow-lg border-b-8 border-yellow-600 flex flex-col items-center justify-center gap-3 text-white">
+                <span class="text-5xl">🎮</span>
+                <span class="text-2xl font-bold font-kids">Zon Permainan</span>
+                <span class="text-sm opacity-90 text-center">Padan Nombor & Sifir (Interaktif)</span>
+            </button>
+        </div>
+
+        <button onclick="nav.showProgress()" class="btn-pop mt-4 bg-white border-4 border-green-500 text-green-600 font-bold px-8 py-3 rounded-2xl text-lg shadow-sm flex items-center gap-2">
+            🏆 Rekod Pencapaian Saya
+        </button>
+    </main>
+
+    <main id="screen-topics" class="hide flex-1 max-w-4xl w-full mx-auto p-4 py-8">
+        <div class="flex items-center gap-4 mb-6">
+            <button onclick="nav.goHome()" class="text-gray-500 hover:text-gray-800 text-4xl btn-pop">🔙</button>
+            <div>
+                <h2 id="volume-title" class="text-3xl font-bold text-indigo-700 font-kids">Topik</h2>
+                <p class="text-gray-500 text-sm font-semibold">Pilih subtopik untuk mula latihan (10 soalan)</p>
+            </div>
+        </div>
+        <div id="topics-container" class="flex flex-col gap-5">
+            <!-- Topics injected here -->
+        </div>
+    </main>
+
+    <main id="screen-quiz" class="hide flex-1 max-w-3xl w-full mx-auto p-4 py-6 flex flex-col h-full">
+        <div class="bg-white rounded-3xl shadow-lg p-5 md:p-8 border-4 border-blue-100 flex-1 flex flex-col">
+            <!-- Header Kuiz -->
+            <div class="flex justify-between items-center mb-6 border-b-2 border-gray-100 pb-4">
+                <span id="quiz-progress" class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold text-sm shadow-inner">Soalan 1/10</span>
+                <span id="quiz-title" class="font-bold text-gray-600 font-kids text-lg md:text-xl text-center flex-1 mx-4 line-clamp-1">Kenali Nombor</span>
+                <button onclick="quizApp.confirmExit()" class="btn-pop text-red-500 font-bold hover:bg-red-50 px-3 py-2 rounded-xl border border-red-200">Keluar</button>
+            </div>
+            
+            <!-- Ruang Soalan -->
+            <div id="question-container" class="mb-4">
+                <h3 id="question-text" class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 leading-snug"></h3>
+                <div id="answer-options" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+
+            <!-- Kanvas Jalan Kira Interaktif -->
+            <div id="canvas-section" class="mt-auto flex flex-col bg-gray-50 p-4 rounded-2xl border-2 border-gray-200">
+                <div class="flex justify-between items-center mb-3 flex-wrap gap-2">
+                    <span class="font-bold text-gray-600 text-sm md:text-base">✍️ Ruang Jalan Kira</span>
+                    <div class="flex gap-2">
+                        <button onclick="canvasApp.setTool('pen')" id="tool-pen" class="btn-pop bg-blue-500 text-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-semibold">✏️ Pen</button>
+                        <button onclick="canvasApp.setTool('eraser')" id="tool-eraser" class="btn-pop bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg shadow-sm text-sm font-semibold">🧹 Padam</button>
+                        <button onclick="canvasApp.clearCanvas()" class="btn-pop bg-red-100 text-red-600 px-3 py-1.5 rounded-lg shadow-sm text-sm font-semibold">🗑️ Kosong</button>
+                    </div>
+                </div>
+                <div class="relative w-full rounded-xl overflow-hidden shadow-inner border border-gray-300 bg-white">
+                    <canvas id="drawing-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Kawalan Bawah -->
+            <div class="mt-6 flex justify-between items-center pt-4 border-t-2 border-gray-100 min-h-[60px]">
+                <div id="feedback-msg" class="text-lg md:text-xl font-bold px-4 py-2 rounded-xl"></div>
+                <button id="btn-next" class="btn-pop bg-green-500 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-md hide ml-auto">Seterusnya ➡️</button>
+                <button id="btn-submit-exam" class="btn-pop bg-purple-600 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-md hide ml-auto">Hantar Jawapan 🏁</button>
+            </div>
+        </div>
+    </main>
+
+    <main id="screen-result" class="hide flex-1 max-w-2xl w-full mx-auto p-4 py-12 flex flex-col items-center justify-center">
+        <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 w-full text-center border-t-8 border-green-500">
+            <div class="text-7xl mb-6 animate-float">🎉</div>
+            <h2 class="text-4xl font-bold text-gray-800 font-kids mb-2">Tamat Latihan!</h2>
+            <p id="result-desc" class="text-gray-500 mb-8 text-lg">Anda telah berjaya menyelesaikan soalan.</p>
+            
+            <div class="bg-green-50 rounded-3xl p-8 mb-8 inline-block min-w-[200px]">
+                <p class="text-green-600 font-bold mb-2 uppercase tracking-wide">Markah Anda</p>
+                <p id="result-score" class="text-6xl font-bold text-green-700 font-kids">10/10</p>
+                <p id="result-percent" class="text-lg font-bold text-green-600 mt-2">100%</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-4">
+                <!-- Nav Bug Fixed Here: Using nav.showVolume instead of undefined function -->
+                <button onclick="nav.showVolume(appState.currentVolume)" class="btn-pop bg-blue-100 text-blue-700 px-6 py-4 rounded-2xl font-bold text-lg hover:bg-blue-200">Pilih Topik Lain</button>
+                <button onclick="nav.goHome()" class="btn-pop bg-green-500 text-white px-6 py-4 rounded-2xl font-bold text-lg shadow-md hover:bg-green-600">Menu Utama</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="custom-modal" class="hide fixed inset-0 z-[100] flex items-center justify-center modal-overlay p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center transform scale-100">
+            <h3 id="modal-title" class="text-2xl font-bold font-kids mb-3 text-gray-800">Perhatian</h3>
+            <p id="modal-msg" class="text-gray-600 mb-8 leading-relaxed">Adakah anda pasti?</p>
+            <div class="flex flex-col gap-3 justify-center" id="modal-actions">
+                <!-- Buttons injected dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State Keseluruhan Aplikasi
+        const appState = {
+            currentVolume: 1,
+            currentTopicId: null,
+            currentSubtopicId: null,
+            mode: 'quiz', // 'quiz', 'exam', 'game'
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            userAnswers: [],
+            progress: JSON.parse(localStorage.getItem('mathT2_progress_v3')) || { totalScore: 0, topicsCompleted: {} }
+        };
+
+        // Pemetaan Sukatan Buku Teks KSSR Tahun 2
+        const curriculum = {
+            1: [
+                { id: 't1_1', title: '1. Nombor Hingga 1000', subtopics: [
+                    { id: 's1_1_1', title: 'Kenali, Sebut & Tulis Nombor' },
+                    { id: 's1_1_2', title: 'Nilai Tempat & Nilai Digit' },
+                    { id: 's1_1_3', title: 'Banding & Susun Nombor' },
+                    { id: 's1_1_4', title: 'Pola Nombor & Bundar' }
+                ]},
+                { id: 't1_2', title: '2. Tambah, Tolak, Darab & Bahagi', subtopics: [
+                    { id: 's1_2_1', title: 'Tambah Dua & Tiga Nombor' },
+                    { id: 's1_2_2', title: 'Tolak & Tolak Berturut-turut' },
+                    { id: 's1_2_3', title: 'Darab (Sifir 2,3,4,5,10)' },
+                    { id: 's1_2_4', title: 'Bahagi (Bina Sifir Bahagi)' }
+                ]}
+            ],
+            2: [
+                { id: 't2_1', title: '3. Pecahan & Perpuluhan', subtopics: [
+                    { id: 's2_1_1', title: 'Kenali Pecahan & Banding' },
+                    { id: 's2_1_2', title: 'Perpuluhan & Banding' }
+                ]},
+                { id: 't2_2', title: '4. Wang', subtopics: [
+                    { id: 's2_2_1', title: 'Kenali Nilai & Tambah/Tolak Wang' },
+                    { id: 's2_2_2', title: 'Darab & Bahagi Wang' }
+                ]},
+                { id: 't2_3', title: '5. Masa dan Waktu', subtopics: [
+                    { id: 's2_3_1', title: 'Sebut & Tulis Waktu (Minit & Jam)' },
+                    { id: 's2_3_2', title: 'Perkaitan Waktu (Hari & Jam)' }
+                ]},
+                { id: 't2_4', title: '6. Ukuran & Sukatan', subtopics: [
+                    { id: 's2_4_1', title: 'Panjang (cm, m)' },
+                    { id: 's2_4_2', title: 'Jisim (g, kg)' },
+                    { id: 's2_4_3', title: 'Isi Padu Cecair (ml, l)' }
+                ]},
+                { id: 't2_5', title: '7. Bentuk', subtopics: [
+                    { id: 's2_5_1', title: 'Ciri-ciri & Bentangan Bentuk 3D' },
+                    { id: 's2_5_2', title: 'Bentuk 2D & Lukis' }
+                ]},
+                { id: 't2_6', title: '8. Pengurusan Data', subtopics: [
+                    { id: 's2_6_1', title: 'Kumpul Data & Carta Palang' }
+                ]}
+            ]
+        };
+
+        const dbQs = {
+            's1_1_1': [
+                {q: "Tuliskan 'Enam ratus empat belas' dalam angka.", a: "614", opts: ["641", "614", "604", "416"]},
+                {q: "Apakah nombor dalam perkataan bagi 305?", a: "Tiga ratus lima", opts: ["Tiga ratus lima puluh", "Tiga ratus lima", "Tiga lima", "Tiga ratus sifar lima"]},
+                {q: "Tuliskan 'Sembilan ratus dua puluh' dalam angka.", a: "920", opts: ["902", "920", "92", "290"]},
+                {q: "Nombor 711 dibaca sebagai...", a: "Tujuh ratus sebelas", opts: ["Tujuh ratus satu satu", "Tujuh ratus sebelas", "Tujuh ratus dua belas", "Satu ratus tujuh"]},
+                {q: "Antara berikut, yang manakah 'Lapan ratus dua'?", a: "802", opts: ["820", "802", "208", "82"]},
+                {q: "Tulis 444 dalam perkataan.", a: "Empat ratus empat puluh empat", opts: ["Empat empat empat", "Empat ratus empat", "Empat ratus empat puluh empat", "Empat ratus empat belas"]},
+                {q: "Tuliskan 'Seratus lima puluh' dalam angka.", a: "150", opts: ["105", "150", "15", "510"]},
+                {q: "Nombor dalam perkataan bagi 999 ialah?", a: "Sembilan ratus sembilan puluh sembilan", opts: ["Sembilan ratus sembilan", "Sembilan ratus sembilan puluh sembilan", "Sembilan sembilan sembilan", "Sembilan ribu"]},
+                {q: "Apakah nombor selepas 299?", a: "300", opts: ["298", "2100", "300", "400"]},
+                {q: "Nombor sebelum 500 ialah...", a: "499", opts: ["499", "501", "490", "409"]}
+            ],
+            's1_1_2': [
+                {q: "Apakah nilai tempat bagi digit 5 dalam nombor 352?", a: "Puluh", opts: ["Sa", "Puluh", "Ratus", "Ribu"]},
+                {q: "Apakah nilai digit bagi 8 dalam nombor 814?", a: "800", opts: ["8", "80", "800", "Ratus"]},
+                {q: "Cerakinkan 427 mengikut nilai digit.", a: "400 + 20 + 7", opts: ["400 + 2 + 7", "40 + 20 + 7", "400 + 20 + 7", "4 + 2 + 7"]},
+                {q: "Cerakinkan 603 mengikut nilai tempat.", a: "6 ratus + 0 puluh + 3 sa", opts: ["6 ratus + 3 puluh + 0 sa", "6 ratus + 0 puluh + 3 sa", "600 + 0 + 3", "6 ratus + 3 sa"]},
+                {q: "Digit manakah berada di tempat sa dalam nombor 791?", a: "1", opts: ["7", "9", "1", "0"]},
+                {q: "Apakah nilai tempat bagi digit 0 dalam 509?", a: "Puluh", opts: ["Sa", "Puluh", "Ratus", "Sifar"]},
+                {q: "Dalam nombor 936, nilai digit 3 ialah...", a: "30", opts: ["3", "30", "300", "Puluh"]},
+                {q: "Gabungkan: 200 + 40 + 5 =", a: "245", opts: ["254", "245", "425", "2045"]},
+                {q: "Gabungkan: 7 ratus + 1 puluh + 0 sa =", a: "710", opts: ["701", "710", "170", "71"]},
+                {q: "Apakah nilai bagi digit bergaris: 1<u>2</u>3?", a: "20", opts: ["2", "20", "200", "Puluh"]}
+            ],
+            's1_1_3': [
+                {q: "Manakah yang lebih besar? 450 atau 405?", a: "450", opts: ["450", "405", "Sama nilai", "Tiada jawapan"]},
+                {q: "Manakah yang lebih kecil? 812 atau 821?", a: "812", opts: ["821", "812", "Sama nilai", "Keduanya besar"]},
+                {q: "Susun nombor secara menaik: 120, 115, 125", a: "115, 120, 125", opts: ["125, 120, 115", "115, 120, 125", "120, 115, 125", "115, 125, 120"]},
+                {q: "Susun nombor secara menurun: 300, 400, 200", a: "400, 300, 200", opts: ["200, 300, 400", "400, 300, 200", "300, 200, 400", "400, 200, 300"]},
+                {q: "Bandingkan 678 dan 687.", a: "678 lebih kecil daripada 687", opts: ["678 lebih besar daripada 687", "678 sama dengan 687", "678 lebih kecil daripada 687", "687 lebih kecil daripada 678"]},
+                {q: "Nombor manakah yang paling besar? 561, 516, 615, 156", a: "615", opts: ["561", "516", "615", "156"]},
+                {q: "Nombor manakah yang paling kecil? 901, 910, 190, 109", a: "109", opts: ["901", "910", "190", "109"]},
+                {q: "Lengkapkan susunan menurun: 550, 540, ___, 520", a: "530", opts: ["535", "530", "560", "510"]},
+                {q: "Lengkapkan susunan menaik: 112, 114, ___, 118", a: "116", opts: ["115", "116", "117", "119"]},
+                {q: "Manakah urutan yang betul (Menaik)?", a: "234, 235, 236", opts: ["236, 235, 234", "234, 235, 236", "235, 234, 236", "234, 236, 235"]}
+            ],
+            's1_1_4': [
+                {q: "Apakah pola nombor ini? 100, 200, 300, 400", a: "Menaik seratus-seratus", opts: ["Menaik sepuluh-sepuluh", "Menurun seratus-seratus", "Menaik seratus-seratus", "Menaik satu-satu"]},
+                {q: "Apakah pola nombor ini? 50, 45, 40, 35", a: "Menurun lima-lima", opts: ["Menaik lima-lima", "Menurun lima-lima", "Menurun sepuluh-sepuluh", "Menaik sepuluh-sepuluh"]},
+                {q: "Lengkapkan pola nombor menaik dua-dua: 12, 14, __, 18", a: "16", opts: ["15", "16", "17", "20"]},
+                {q: "Bundarkan 43 kepada puluh terdekat.", a: "40", opts: ["40", "50", "45", "30"]},
+                {q: "Bundarkan 78 kepada puluh terdekat.", a: "80", opts: ["70", "80", "75", "90"]},
+                {q: "Bundarkan 254 kepada ratus terdekat.", a: "300", opts: ["200", "300", "250", "400"]},
+                {q: "Bundarkan 619 kepada ratus terdekat.", a: "600", opts: ["600", "700", "650", "620"]},
+                {q: "Lengkapkan pola menurun sepuluh-sepuluh: 320, 310, ___", a: "300", opts: ["290", "300", "330", "305"]},
+                {q: "Nombor 85 jika dibundarkan kepada puluh terdekat menjadi?", a: "90", opts: ["80", "90", "100", "85"]},
+                {q: "Bundarkan 891 kepada ratus terdekat.", a: "900", opts: ["800", "900", "890", "1000"]}
+            ],
+            's2_1_1': [
+                {q: "Apakah nama pecahan bagi 1/2?", a: "Satu perdua (Separuh)", opts: ["Satu pertiga", "Satu perdua (Separuh)", "Satu perempat", "Satu persepuluh"]},
+                {q: "Tiga bahagian daripada empat bahagian yang sama besar ditulis sebagai...", a: "3/4 (Tiga perempat)", opts: ["1/4 (Satu perempat)", "2/4 (Dua perempat)", "3/4 (Tiga perempat)", "4/3 (Empat pertiga)"]},
+                {q: "Dalam pecahan 1/5, nombor 1 dikenali sebagai...", a: "Pengangka", opts: ["Penyebut", "Pengangka", "Pecahan", "Bahagian"]},
+                {q: "Dalam pecahan 2/7, nombor 7 dikenali sebagai...", a: "Penyebut", opts: ["Penyebut", "Pengangka", "Bawah", "Jumlah"]},
+                {q: "Antara pecahan berikut, manakah yang paling besar nilainya?", a: "1/2", opts: ["1/2", "1/4", "1/8", "1/10"]},
+                {q: "Manakah pecahan yang lebih kecil? 1/3 atau 1/6?", a: "1/6", opts: ["1/3", "1/6", "Sama nilai", "Tiada jawapan"]},
+                {q: "Satu perempat juga dikenali sebagai...", a: "Suku", opts: ["Suku", "Separuh", "Tiga Suku", "Penuh"]},
+                {q: "Tiga perempat juga dikenali sebagai...", a: "Tiga suku", opts: ["Suku", "Separuh", "Tiga suku", "Satu"]},
+                {q: "Pilih pecahan bagi 'Tujuh persepuluh'.", a: "7/10", opts: ["10/7", "7/10", "7/8", "1/10"]},
+                {q: "Bandingkan 4/9 dan 7/9. Yang mana lebih besar?", a: "7/9", opts: ["4/9", "7/9", "Sama nilai", "Sukar ditentukan"]}
+            ],
+            's2_1_2': [
+                {q: "Tukar pecahan 1/10 kepada nombor perpuluhan.", a: "0.1", opts: ["1.0", "0.1", "0.01", "10.0"]},
+                {q: "Tukar pecahan 6/10 kepada nombor perpuluhan.", a: "0.6", opts: ["0.06", "6.0", "0.6", "6.10"]},
+                {q: "Apakah perpuluhan bagi 'Sifar perpuluhan tiga'?", a: "0.3", opts: ["3.0", "0.03", "0.3", "30.0"]},
+                {q: "Sifar perpuluhan lapan ditulis sebagai...", a: "0.8", opts: ["0.8", "8.0", "0.08", "8"]},
+                {q: "Pecahan persepuluh bagi 0.5 ialah...", a: "5/10", opts: ["1/5", "5/10", "10/5", "5/100"]},
+                {q: "Manakah yang lebih besar? 0.4 atau 0.7?", a: "0.7", opts: ["0.4", "0.7", "Sama nilai", "0.0"]},
+                {q: "Manakah yang lebih kecil? 0.9 atau 0.2?", a: "0.2", opts: ["0.9", "0.2", "Sama nilai", "0.1"]},
+                {q: "Bandingkan 0.5 dan 3/10. Mana lebih besar?", a: "0.5", opts: ["0.5", "3/10", "Sama nilai", "Tiga persepuluh"]},
+                {q: "Bandingkan 8/10 dan 0.8. Mana lebih besar?", a: "Kedua-duanya sama", opts: ["8/10", "0.8", "Kedua-duanya sama", "Sifar"]},
+                {q: "Lengkapkan susunan menaik: 0.1, 0.2, ___, 0.4", a: "0.3", opts: ["0.5", "0.3", "3/10", "1.3"]}
+            ],
+            's2_3_1': [
+                {q: "Senggatan nombor 1 pada muka jam mewakili berapa minit?", a: "5 minit", opts: ["1 minit", "5 minit", "10 minit", "15 minit"]},
+                {q: "Jika jarum panjang menunjuk pada nombor 3, berapa minitkah itu?", a: "15 minit", opts: ["3 minit", "15 minit", "30 minit", "45 minit"]},
+                {q: "Jarum panjang menunjuk ke angka 6 dikenali sebagai...", a: "Setengah jam (30 minit)", opts: ["Suku jam", "Setengah jam (30 minit)", "Satu jam", "Tiga suku jam"]},
+                {q: "Pukul berapakah jika jarum pendek pada 4, dan jarum panjang pada 12?", a: "Pukul 4:00", opts: ["Pukul 12:20", "Pukul 4:00", "Pukul 4:30", "Pukul 12:00"]},
+                {q: "Pukul 2 setengah ditulis dalam angka ialah...", a: "2:30", opts: ["2:00", "2:15", "2:30", "2:45"]},
+                {q: "Suku jam bersamaan dengan berapa minit?", a: "15 minit", opts: ["10 minit", "15 minit", "30 minit", "45 minit"]},
+                {q: "Tiga suku jam bersamaan dengan berapa minit?", a: "45 minit", opts: ["15 minit", "30 minit", "45 minit", "60 minit"]},
+                {q: "Tuliskan 'Pukul lapan lima belas minit' dalam bentuk angka.", a: "8:15", opts: ["8:05", "8:15", "8:30", "8:50"]},
+                {q: "Jarum pendek menunjuk antara 9 dan 10, jarum panjang pada 6. Pukul berapa?", a: "9:30", opts: ["10:30", "9:06", "9:30", "6:45"]},
+                {q: "Jarum minit bergerak dari angka 12 ke angka 1. Berapa minit yang berlalu?", a: "5 minit", opts: ["1 minit", "5 minit", "10 minit", "60 minit"]}
+            ],
+            's2_3_2': [
+                {q: "1 jam bersamaan dengan berapa minit?", a: "60 minit", opts: ["30 minit", "60 minit", "100 minit", "24 minit"]},
+                {q: "1 hari bersamaan dengan berapa jam?", a: "24 jam", opts: ["12 jam", "24 jam", "60 jam", "7 jam"]},
+                {q: "Satu putaran lengkap jarum panjang (minit) mengambil masa...", a: "1 jam", opts: ["1 minit", "1 jam", "1 hari", "12 jam"]},
+                {q: "Jika sekarang pukul 8:00 pagi, satu jam kemudian ialah pukul?", a: "9:00 pagi", opts: ["7:00 pagi", "9:00 pagi", "8:30 pagi", "10:00 pagi"]},
+                {q: "Ali mula bermain pada 5:00 petang. Dia bermain selama 30 minit. Pukul berapakah dia tamat?", a: "5:30 petang", opts: ["6:00 petang", "5:30 petang", "4:30 petang", "5:15 petang"]},
+                {q: "Berapa jam yang ada dalam tempoh separuh hari (setengah hari)?", a: "12 jam", opts: ["6 jam", "12 jam", "24 jam", "8 jam"]},
+                {q: "Jarum jam berputar 2 pusingan lengkap dalam sehari. Benar atau salah?", a: "Benar", opts: ["Benar", "Salah", "Hanya 1 putaran", "Tiada jawapan"]},
+                {q: "Jika jarum minit bergerak separuh pusingan, berapa minit telah berlalu?", a: "30 minit", opts: ["15 minit", "30 minit", "45 minit", "60 minit"]},
+                {q: "Jam menunjukkan 10:15. Berapa minit lagi untuk menjadi 10:30?", a: "15 minit", opts: ["5 minit", "10 minit", "15 minit", "30 minit"]},
+                {q: "1 jam 15 minit bersamaan dengan...", a: "75 minit", opts: ["60 minit", "75 minit", "115 minit", "65 minit"]}
+            ],
+            's2_4_1': [
+                {q: "Simbol bagi sentimeter ialah...", a: "cm", opts: ["m", "cm", "g", "ml"]},
+                {q: "Simbol bagi meter ialah...", a: "m", opts: ["m", "cm", "kg", "l"]},
+                {q: "Alat yang paling sesuai untuk mengukur panjang sebatang pensel ialah...", a: "Pembaris (cm)", opts: ["Pita pengukur (m)", "Pembaris (cm)", "Penimbang", "Bikar"]},
+                {q: "Panjang sebuah bilik darjah biasanya diukur dalam unit...", a: "Meter (m)", opts: ["Sentimeter (cm)", "Meter (m)", "Gram (g)", "Liter (l)"]},
+                {q: "1 meter (m) bersamaan dengan berapa sentimeter (cm)?", a: "100 cm", opts: ["10 cm", "100 cm", "1000 cm", "50 cm"]},
+                {q: "Mengukur panjang dengan pembaris mesti bermula dari tanda...", a: "Sifar (0)", opts: ["Satu (1)", "Sifar (0)", "Hujung pembaris", "Mana-mana"]},
+                {q: "Tali A panjangnya 45 cm. Tali B panjangnya 30 cm. Berapakah beza panjang tali tersebut?", a: "15 cm", opts: ["75 cm", "15 cm", "10 cm", "20 cm"]},
+                {q: "Pokok kelapa diukur menggunakan unit...", a: "Meter (m)", opts: ["Sentimeter (cm)", "Meter (m)", "Kilogram (kg)", "Liter (l)"]},
+                {q: "Panjang sebuah buku tulis lebih kurang...", a: "20 cm", opts: ["2 cm", "20 cm", "2 m", "20 m"]},
+                {q: "5 meter ditulis ringkas sebagai...", a: "5 m", opts: ["5 cm", "5 m", "5 g", "5 l"]}
+            ],
+            's2_4_2': [
+                {q: "Simbol bagi gram ialah...", a: "g", opts: ["g", "kg", "cm", "ml"]},
+                {q: "Simbol bagi kilogram ialah...", a: "kg", opts: ["g", "kg", "m", "l"]},
+                {q: "1 kilogram (kg) bersamaan dengan berapa gram (g)?", a: "1000 g", opts: ["100 g", "1000 g", "10 g", "500 g"]},
+                {q: "Berat sebiji epal lebih sesuai diukur menggunakan unit...", a: "Gram (g)", opts: ["Kilogram (kg)", "Gram (g)", "Meter (m)", "Liter (l)"]},
+                {q: "Berat seorang murid Tahun 2 diukur menggunakan unit...", a: "Kilogram (kg)", opts: ["Gram (g)", "Kilogram (kg)", "Sentimeter", "Mililiter"]},
+                {q: "Jarum alat penimbang menunjuk tepat pada angka 2 kg. Berapakah jisim objek tersebut?", a: "2 kg", opts: ["2 g", "2 kg", "20 kg", "200 g"]},
+                {q: "Manakah lebih berat? 500 g kapas atau 1 kg besi?", a: "1 kg besi", opts: ["500 g kapas", "1 kg besi", "Sama berat", "Tidak tahu"]},
+                {q: "Setengah kilogram (1/2 kg) bersamaan dengan...", a: "500 g", opts: ["50 g", "500 g", "250 g", "1000 g"]},
+                {q: "Jisim gula ialah 200 g. Jisim tepung ialah 300 g. Berapakah jumlah jisim?", a: "500 g", opts: ["100 g", "500 g", "600 g", "1 kg"]},
+                {q: "Alat untuk mengukur jisim dipanggil...", a: "Alat penimbang", opts: ["Pembaris", "Alat penimbang", "Silinder penyukat", "Jam randik"]}
+            ],
+            's2_4_3': [
+                {q: "Simbol bagi mililiter ialah...", a: "ml", opts: ["ml", "l", "m", "g"]},
+                {q: "Simbol bagi liter ialah...", a: "l", opts: ["ml", "l", "kg", "cm"]},
+                {q: "Isi padu ubat demam di dalam picagari diukur dalam unit...", a: "Mililiter (ml)", opts: ["Liter (l)", "Mililiter (ml)", "Gram", "Meter"]},
+                {q: "Isi padu sebotol besar air mineral diukur dalam unit...", a: "Liter (l)", opts: ["Mililiter (ml)", "Liter (l)", "Kilogram", "Sentimeter"]},
+                {q: "1 liter (l) bersamaan dengan...", a: "1000 ml", opts: ["100 ml", "1000 ml", "10 ml", "500 ml"]},
+                {q: "Semasa menyukat isi padu cecair, kedudukan mata mestilah...", a: "Selari dengan aras cecair", opts: ["Dari atas", "Dari bawah", "Selari dengan aras cecair", "Bebas"]},
+                {q: "Bikar A mengandungi 400 ml air. Bikar B mengandungi 300 ml air. Jumlah air ialah?", a: "700 ml", opts: ["100 ml", "700 ml", "700 l", "600 ml"]},
+                {q: "Berapakah isi padu cecair dalam tin minuman kola biasa?", a: "320 ml", opts: ["320 l", "320 ml", "3 ml", "30 l"]},
+                {q: "Baldi selalunya mampu mengisi cecair berkapasiti...", a: "10 l", opts: ["10 ml", "10 l", "100 ml", "1 l"]},
+                {q: "Setengah liter (1/2 l) bersamaan dengan...", a: "500 ml", opts: ["50 ml", "500 ml", "250 ml", "1000 ml"]}
+            ],
+            's2_5_1': [
+                {q: "Bentuk 3D yang mempunyai 6 permukaan rata segi empat sama dipanggil...", a: "Kubus", opts: ["Kubus", "Kuboid", "Piramid", "Sfera"]},
+                {q: "Kuboid mempunyai berapa permukaan rata segi empat tepat?", a: "6", opts: ["4", "6", "8", "12"]},
+                {q: "Bentuk 3D manakah yang hanya mempunyai 1 permukaan melengkung dan tiada bucu?", a: "Sfera", opts: ["Silinder", "Kon", "Sfera", "Kubus"]},
+                {q: "Berapakah bilangan bucu bagi sebuah kubus?", a: "8", opts: ["4", "6", "8", "12"]},
+                {q: "Bentuk apakah yang mempunyai 1 permukaan melengkung, 1 permukaan rata dan 1 bucu?", a: "Kon", opts: ["Silinder", "Kon", "Piramid", "Sfera"]},
+                {q: "Silinder mempunyai 2 permukaan rata (bulatan) dan berapa permukaan melengkung?", a: "1", opts: ["1", "2", "3", "Tiada"]},
+                {q: "Sebuah piramid bertapak segi empat sama mempunyai berapa bucu secara keseluruhan?", a: "5", opts: ["4", "5", "6", "8"]},
+                {q: "Bentangan yang terdiri daripada 6 keping segi empat sama akan membentuk...", a: "Kubus", opts: ["Kuboid", "Kubus", "Kon", "Silinder"]},
+                {q: "Bentangan yang mempunyai 1 segi empat tepat dan 2 bulatan akan membentuk...", a: "Silinder", opts: ["Sfera", "Kon", "Silinder", "Piramid"]},
+                {q: "Berapakah bilangan sisi lurus bagi sebuah kuboid?", a: "12", opts: ["6", "8", "12", "16"]}
+            ],
+            's2_5_2': [
+                {q: "Bentuk 2D yang mempunyai 4 sisi lurus yang SAMA panjang dikenali sebagai...", a: "Segi empat sama", opts: ["Segi empat tepat", "Segi empat sama", "Segi tiga", "Bulatan"]},
+                {q: "Bentuk 2D yang mempunyai 2 sisi bertentangan yang sama panjang dikenali sebagai...", a: "Segi empat tepat", opts: ["Segi empat sama", "Segi empat tepat", "Bulatan", "Segi tiga"]},
+                {q: "Segi tiga mempunyai berapa sisi lurus?", a: "3", opts: ["2", "3", "4", "Tiada"]},
+                {q: "Bentuk manakah yang hanya mempunyai 1 sisi melengkung dan tiada bucu?", a: "Bulatan", opts: ["Bulatan", "Segi empat", "Segi tiga", "Sfera"]},
+                {q: "Berapakah bilangan bucu bagi segi empat sama?", a: "4", opts: ["2", "3", "4", "8"]},
+                {q: "Sebuah segi tiga mempunyai 3 sisi lurus dan ___ bucu.", a: "3", opts: ["2", "3", "4", "Tiada"]},
+                {q: "Permukaan meja tulis di kelas anda selalunya berbentuk...", a: "Segi empat tepat", opts: ["Segi empat sama", "Segi empat tepat", "Bulatan", "Segi tiga"]},
+                {q: "Permukaan sekeping duit syiling 20 sen berbentuk...", a: "Bulatan", opts: ["Segi empat", "Segi tiga", "Bulatan", "Sfera"]},
+                {q: "Bentuk 2D (dua dimensi) mempunyai ciri-ciri rata. Betul atau Salah?", a: "Betul", opts: ["Betul", "Salah", "Mempunyai ketebalan", "Bentuk 3D"]},
+                {q: "Bentuk apakah yang boleh dilukis dengan menyurih tapak silinder?", a: "Bulatan", opts: ["Segi empat", "Segi tiga", "Bulatan", "Segi empat sama"]}
+            ],
+            's2_6_1': [
+                {q: "Kaedah mengira data dengan membuat tanda garisan (||||) dipanggil...", a: "Gundal", opts: ["Gundal", "Carta", "Palang", "Piktograf"]},
+                {q: "Dalam kaedah gundal, satu kumpulan gundal yang dipalang bersilang mewakili nombor...", a: "5", opts: ["4", "5", "10", "1"]},
+                {q: "Carta yang menggunakan palang blok bersegi empat untuk mewakili data dipanggil...", a: "Carta Palang", opts: ["Carta Pai", "Carta Palang", "Piktograf", "Jadual"]},
+                {q: "Paksi mendatar pada carta palang dipanggil...", a: "Paksi Mengufuk", opts: ["Paksi Mencancang", "Paksi Mengufuk", "Paksi Menegak", "Gundal"]},
+                {q: "Paksi menegak pada carta palang dipanggil...", a: "Paksi Mencancang", opts: ["Paksi Mengufuk", "Paksi Mencancang", "Paksi Melintang", "Skala"]},
+                {q: "Jika palang 'Aiskrim Coklat' menunjuk pada angka 8 di paksi mencancang, berapakah bilangan murid yang menyukainya?", a: "8", opts: ["7", "8", "9", "Tiada jawapan"]},
+                {q: "Tajuk carta palang memberitahu kita tentang...", a: "Maklumat yang dipaparkan dalam carta", opts: ["Warna carta", "Maklumat yang dipaparkan dalam carta", "Nama pelukis", "Tiada fungsi"]},
+                {q: "Tanda gundal (||) mewakili nombor...", a: "2", opts: ["1", "2", "3", "5"]},
+                {q: "Carta palang boleh dilukis secara mencancang atau...", a: "Mengufuk", opts: ["Melengkung", "Membulat", "Mengufuk", "Segi tiga"]},
+                {q: "Jika gundal ditunjukkan sebagai (|||| \\ ) iaitu 5 garisan, dan (|||) 3 garisan. Jumlahnya ialah?", a: "8", opts: ["5", "3", "8", "53"]}
+            ]
+        };
+
+        const dbQsKb = {
+            's1_1_4': [
+                {q: "Siva ada 245 keping setem. Amin ada 10 keping setem lebih daripada Siva. Berapakah setem Amin?", a: "255", opts: ["235", "255", "240", "345"]},
+                {q: "Sebuah kotak ada 500 biji guli. Ali memasukkan 200 biji guli lagi. Kemudian dia memberikan 50 biji kepada adiknya. Berapa baki guli?", a: "650", opts: ["750", "650", "700", "600"]},
+                {q: "Rani menyusun nombor secara menaik sepuluh-sepuluh: 110, 120, P, 140. Apakah nilai P?", a: "130", opts: ["125", "130", "135", "150"]}
+            ],
+            's1_2_1': [
+                {q: "Di dalam sebuah bakul ada 125 biji epal merah dan 140 biji epal hijau. Berapakah jumlah epal di dalam bakul itu?", a: "265", opts: ["255", "265", "275", "165"]},
+                {q: "Amir membeli 150 keping pelekat. Kawannya memberinya 45 keping pelekat lagi. Berapakah jumlah pelekat Amir sekarang?", a: "195", opts: ["185", "195", "105", "205"]},
+                {q: "Cikgu Fatimah memesan 200 buah buku cerita, 50 buah buku mewarna dan 10 buah kamus. Berapakah jumlah buku yang dipesannya?", a: "260", opts: ["250", "260", "270", "160"]}
+            ],
+            's1_2_2': [
+                {q: "Sebuah kedai kek membuat 350 biji karipap. 120 biji karipap telah dijual pada waktu pagi. Berapa biji karipap yang tinggal?", a: "230", opts: ["220", "230", "240", "130"]},
+                {q: "Raju mengumpul 480 tin kosong. Dia membuang 50 tin yang rosak. Berapakah baki tin yang boleh dikitar semula?", a: "430", opts: ["440", "430", "330", "530"]},
+                {q: "Dalam satu larian, terdapat 500 orang peserta. 300 orang telah sampai ke garisan penamat. Berapa orang yang belum sampai?", a: "200", opts: ["100", "200", "300", "400"]}
+            ],
+            's1_2_3': [
+                {q: "Sebuah kereta mempunyai 4 biji tayar. Berapakah jumlah tayar bagi 5 buah kereta yang sama?", a: "20", opts: ["16", "20", "24", "9"]},
+                {q: "Aminah membeli 3 kotak pensel. Setiap kotak mengandungi 10 batang pensel. Berapa batang pensel semuanya?", a: "30", opts: ["13", "20", "30", "40"]},
+                {q: "Pak Ali menanam pokok pisang dalam 4 barisan. Setiap baris ada 5 batang pokok pisang. Berapakah jumlah pokok pisangnya?", a: "20", opts: ["15", "20", "25", "9"]}
+            ],
+            's1_2_4': [
+                {q: "Cikgu Siti ada 30 batang pensel. Dia membahagikan sama banyak kepada 5 orang murid. Berapa batang pensel setiap murid dapat?", a: "6", opts: ["5", "6", "7", "10"] },
+                {q: "Sebuah van sekolah boleh membawa 10 orang murid. Berapa buah van diperlukan untuk membawa 40 orang murid?", a: "4", opts: ["3", "4", "5", "40"]},
+                {q: "Abu mempunyai 24 biji guli. Dia menyimpannya secara sama banyak ke dalam 3 buah balang. Berapa guli dalam setiap balang?", a: "8", opts: ["6", "7", "8", "9"]}
+            ],
+            's2_1_1': [
+                {q: "Sebiji piza dipotong kepada 4 bahagian yang sama besar. Ali makan 1 bahagian. Apakah pecahan piza yang dimakan Ali?", a: "1/4", opts: ["1/2", "1/4", "3/4", "2/4"]},
+                {q: "Ibu memotong kek kepada 10 keping. Adik mengambil 3 keping. Apakah pecahan kek yang diambil adik?", a: "3/10", opts: ["7/10", "3/10", "1/10", "3/4"]},
+                {q: "Dalam sebuah taman, separuh daripada bunga ialah bunga mawar. Apakah pecahan bagi separuh?", a: "1/2", opts: ["1/4", "1/2", "3/4", "1/10"]}
+            ],
+            's2_1_2': [
+                {q: "Cikgu menulis 'Sifar perpuluhan lapan' di papan putih. Apakah nombor perpuluhan tersebut?", a: "0.8", opts: ["0.08", "8.0", "0.8", "8/10"]},
+                {q: "Ali minum 0.4 liter air. Bakar minum 0.6 liter air. Siapakah yang minum air lebih banyak?", a: "Bakar", opts: ["Ali", "Bakar", "Sama banyak", "Tiada jawapan"]},
+                {q: "Manakah yang lebih kecil, 0.3 keping coklat atau 0.7 keping coklat?", a: "0.3", opts: ["0.7", "0.3", "Sama", "Sifar"]}
+            ],
+            's2_2_2': [
+                {q: "Harga sebuah buku ialah RM 5.00. Ali membeli 4 buah buku yang sama. Berapakah jumlah wang yang perlu dibayar?", a: "RM 20.00", opts: ["RM 9.00", "RM 20.00", "RM 15.00", "RM 10.00"]},
+                {q: "Muthu ada RM 50. Dia membeli mainan berharga RM 35. Berapakah baki wangnya?", a: "RM 15.00", opts: ["RM 25.00", "RM 15.00", "RM 20.00", "RM 85.00"]},
+                {q: "Ibu memberi RM 10 kepada kakak dan adik untuk dikongsi sama banyak. Berapa ringgit seorang dapat?", a: "RM 5.00", opts: ["RM 10.00", "RM 5.00", "RM 2.00", "RM 4.00"]}
+            ],
+            's2_3_2': [
+                {q: "Kelas muzik bermula pada pukul 3:00 petang dan tamat pada pukul 4:00 petang. Berapa lamakah kelas tersebut?", a: "1 jam", opts: ["30 minit", "1 jam", "2 jam", "45 minit"]},
+                {q: "Sekarang pukul 9:15 pagi. Loceng rehat akan berbunyi 15 minit lagi. Pukul berapakah loceng akan berbunyi?", a: "9:30 pagi", opts: ["9:20 pagi", "9:45 pagi", "9:30 pagi", "10:00 pagi"]},
+                {q: "Ayah memandu kereta selama 2 jam. Jika dia mula memandu jam 8:00 pagi, pukul berapakah dia akan sampai?", a: "10:00 pagi", opts: ["9:00 pagi", "10:00 pagi", "11:00 pagi", "12:00 tengah hari"]}
+            ],
+            's2_4_3': [
+                {q: "Jisim sebiji tembikai ialah 2 kg. Jisim sebiji betik ialah 1 kg. Berapakah beza jisim buah-buahan tersebut?", a: "1 kg", opts: ["3 kg", "1 kg", "2 kg", "4 kg"]},
+                {q: "Sehelai reben merah panjangnya 50 cm. Reben biru panjangnya 30 cm. Berapakah jumlah panjang kedua-dua reben?", a: "80 cm", opts: ["20 cm", "80 cm", "100 cm", "50 cm"]},
+                {q: "Sebuah jag mengandungi 1000 ml air. Adik telah minum 200 ml. Berapakah baki air di dalam jag?", a: "800 ml", opts: ["1200 ml", "800 ml", "700 ml", "900 ml"]}
+            ],
+            's2_5_2': [
+                {q: "Saya mempunyai 6 permukaan rata segi empat sama. Saya ada 8 bucu. Siapakah saya?", a: "Kubus", opts: ["Kuboid", "Kubus", "Silinder", "Piramid"]},
+                {q: "Cikgu meminta murid melukis bentuk 2D yang ada 3 sisi lurus dan 3 bucu. Bentuk apakah itu?", a: "Segi tiga", opts: ["Segi empat sama", "Segi empat tepat", "Segi tiga", "Bulatan"]},
+                {q: "Bina satu model: 2 buah kubus dan 1 buah silinder disusun bertingkat. Berapakah jumlah permukaan melengkung yang ada pada model itu?", a: "1", opts: ["0", "1", "2", "3"]}
+            ],
+            's2_6_1': [
+                {q: "Berdasarkan carta palang, 5 orang murid suka epal dan 3 orang suka oren. Berapakah jumlah murid?", a: "8", opts: ["5", "3", "8", "2"]},
+                {q: "Gundal bagi sebuah kereta ialah |||| ||. Berapakah bilangan kereta tersebut?", a: "7", opts: ["5", "6", "7", "8"]},
+                {q: "Jika 1 palang mewakili 1 orang, dan palang 'Sukan' setinggi nombor 10. Berapa orang murid yang suka Sukan?", a: "10", opts: ["5", "1", "10", "0"]}
+            ]
+        };
+
+        const visualHelper = {
+            clock: (h, m) => {
+                const hA = (h % 12) * 30 + (m * 0.5);
+                const mA = m * 6;
+                return `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md"><circle cx="50" cy="50" r="45" fill="white" stroke="#374151" stroke-width="4"/><line x1="50" y1="50" x2="${50 + 25 * Math.sin(hA * Math.PI / 180)}" y2="${50 - 25 * Math.cos(hA * Math.PI / 180)}" stroke="#1f2937" stroke-width="4" stroke-linecap="round"/><line x1="50" y1="50" x2="${50 + 35 * Math.sin(mA * Math.PI / 180)}" y2="${50 - 35 * Math.cos(mA * Math.PI / 180)}" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="3" fill="#1f2937"/></svg>`;
+            },
+            groups: (g, i, e='🍎') => {
+                let html = '<div class="flex flex-wrap justify-center gap-4 my-4">';
+                for(let k=0; k<g; k++) {
+                    html += '<div class="bg-white p-2 rounded-xl border-2 border-dashed border-blue-300 text-2xl flex flex-wrap max-w-[100px] justify-center gap-1 shadow-sm">';
+                    for(let j=0; j<i; j++) html += `<span>${e}</span>`;
+                    html += '</div>';
+                }
+                html += '</div>';
+                return html;
+            },
+            fraction: (n, d) => {
+                let html = '<div class="flex justify-center mx-auto my-6 border-4 border-gray-800 rounded-lg overflow-hidden w-64 h-12 shadow-md">';
+                for(let i=0; i<d; i++) {
+                    html += `<div class="flex-1 ${i < n ? 'bg-blue-500' : 'bg-white'} ${i > 0 ? 'border-l-4 border-gray-800' : ''}"></div>`;
+                }
+                html += '</div>';
+                return html;
+            },
+            shape3D: (type) => {
+                let svg = '';
+                if(type === 'kubus') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round"><path d="M30 30h40v40H30z" fill="#bfdbfe"/><path d="M30 30l15-15h40l-15 15z" fill="#93c5fd"/><path d="M70 30l15-15v40l-15 15z" fill="#60a5fa"/></svg>`;
+                if(type === 'silinder') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md" fill="none" stroke="#ea580c" stroke-width="3"><ellipse cx="50" cy="25" rx="25" ry="10" fill="#fed7aa"/><path d="M25 25v50c0 5.5 11.2 10 25 10s25-4.5 25-10V25" fill="#ffedd5"/></svg>`;
+                if(type === 'kon') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md" fill="none" stroke="#16a34a" stroke-width="3"><path d="M50 15L25 75a25 10 0 0 0 50 0z" fill="#bbf7d0"/><ellipse cx="50" cy="75" rx="25" ry="10" fill="#86efac"/></svg>`;
+                if(type === 'sfera') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md"><circle cx="50" cy="50" r="40" fill="url(#grad1)" stroke="#334155" stroke-width="2"/><defs><radialGradient id="grad1" cx="30%" cy="30%" r="70%"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></radialGradient></defs></svg>`;
+                if(type === 'kuboid') svg = `<svg viewBox="0 0 100 100" class="w-40 h-24 mx-auto my-4 drop-shadow-md" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-linejoin="round"><path d="M20 40h60v40H20z" fill="#ddd6fe"/><path d="M20 40l15-15h60l-15 15z" fill="#c4b5fd"/><path d="M80 40l15-15v40l-15 15z" fill="#a78bfa"/></svg>`;
+                return svg;
+            },
+            shape2D: (type) => {
+                let svg = '';
+                if(type === 'bulatan') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md"><circle cx="50" cy="50" r="40" fill="#fde047" stroke="#ca8a04" stroke-width="4"/></svg>`;
+                if(type === 'segiempat') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md"><rect x="20" y="20" width="60" height="60" fill="#f87171" stroke="#b91c1c" stroke-width="4"/></svg>`;
+                if(type === 'segiempattpt') svg = `<svg viewBox="0 0 100 100" class="w-40 h-24 mx-auto my-4 drop-shadow-md"><rect x="10" y="25" width="80" height="50" fill="#60a5fa" stroke="#1d4ed8" stroke-width="4"/></svg>`;
+                if(type === 'segitiga') svg = `<svg viewBox="0 0 100 100" class="w-32 h-32 mx-auto my-4 drop-shadow-md"><polygon points="50,15 90,80 10,80" fill="#c084fc" stroke="#7e22ce" stroke-width="4" stroke-linejoin="round"/></svg>`;
+                return svg;
+            },
+            ruler: () => `<svg viewBox="0 0 200 60" class="w-full max-w-sm mx-auto my-4 drop-shadow-md"><rect x="0" y="10" width="200" height="40" fill="#fef08a" stroke="#ca8a04" stroke-width="3"/><line x1="20" y1="10" x2="20" y2="30" stroke="#ca8a04" stroke-width="3"/><line x1="100" y1="10" x2="100" y2="30" stroke="#ca8a04" stroke-width="3"/><line x1="180" y1="10" x2="180" y2="30" stroke="#ca8a04" stroke-width="3"/><text x="16" y="45" font-size="14" font-weight="bold" fill="#ca8a04">0</text><text x="96" y="45" font-size="14" font-weight="bold" fill="#ca8a04">1</text><text x="176" y="45" font-size="14" font-weight="bold" fill="#ca8a04">2</text></svg>`,
+            scale: () => `<svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto my-4 drop-shadow-md"><rect x="30" y="50" width="40" height="30" rx="5" fill="#cbd5e1" stroke="#475569" stroke-width="3"/><path d="M20 50 Q50 20 80 50 Z" fill="#e2e8f0" stroke="#475569" stroke-width="3"/><circle cx="50" cy="45" r="12" fill="#f8fafc" stroke="#475569" stroke-width="2"/><line x1="50" y1="45" x2="55" y2="38" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/></svg>`,
+            beaker: () => `<svg viewBox="0 0 100 100" class="w-24 h-24 mx-auto my-4 drop-shadow-md"><path d="M35 15 L35 85 A15 10 0 0 0 65 85 L65 15" fill="none" stroke="#94a3b8" stroke-width="4"/><path d="M35 50 L35 85 A15 10 0 0 0 65 85 L65 50 Z" fill="#60a5fa" opacity="0.6"/><line x1="35" y1="40" x2="45" y2="40" stroke="#94a3b8" stroke-width="2"/><line x1="35" y1="60" x2="45" y2="60" stroke="#94a3b8" stroke-width="2"/></svg>`
+        };
+
+        function addVisualsToDB() {
+            if(dbQs['s2_1_1']) {
+                dbQs['s2_1_1'][0].visual = visualHelper.fraction(1, 2);
+                dbQs['s2_1_1'][1].visual = visualHelper.fraction(3, 4);
+                dbQs['s2_1_1'][4].visual = visualHelper.fraction(1, 2);
+                dbQs['s2_1_1'][8].visual = visualHelper.fraction(7, 10);
+            }
+            if(dbQs['s2_3_1']) {
+                dbQs['s2_3_1'][1].visual = visualHelper.clock(12, 15); 
+                dbQs['s2_3_1'][2].visual = visualHelper.clock(12, 30); 
+                dbQs['s2_3_1'][3].visual = visualHelper.clock(4, 0); 
+                dbQs['s2_3_1'][4].visual = visualHelper.clock(2, 30); 
+                dbQs['s2_3_1'][7].visual = visualHelper.clock(8, 15); 
+                dbQs['s2_3_1'][8].visual = visualHelper.clock(9, 30); 
+            }
+            if(dbQs['s2_5_1']) {
+                dbQs['s2_5_1'][0].visual = visualHelper.shape3D('kubus');
+                dbQs['s2_5_1'][1].visual = visualHelper.shape3D('kuboid');
+                dbQs['s2_5_1'][2].visual = visualHelper.shape3D('sfera'); 
+                dbQs['s2_5_1'][4].visual = visualHelper.shape3D('kon');
+                dbQs['s2_5_1'][5].visual = visualHelper.shape3D('silinder');
+                dbQs['s2_5_1'][7].visual = visualHelper.shape3D('kubus');
+            }
+            if(dbQs['s2_5_2']) {
+                dbQs['s2_5_2'][0].visual = visualHelper.shape2D('segiempat');
+                dbQs['s2_5_2'][1].visual = visualHelper.shape2D('segiempattpt');
+                dbQs['s2_5_2'][2].visual = visualHelper.shape2D('segitiga');
+                dbQs['s2_5_2'][3].visual = visualHelper.shape2D('bulatan');
+                dbQs['s2_5_2'][4].visual = visualHelper.shape2D('segiempat');
+            }
+            if(dbQs['s2_6_1']) {
+                dbQs['s2_6_1'][5].visual = `<div class="flex items-end justify-center h-32 gap-6 my-4 border-l-4 border-b-4 border-gray-600 p-2 pl-4"><div class="bg-pink-400 w-12 h-20 rounded-t-md relative shadow-sm"><span class="absolute -bottom-6 text-sm font-bold w-full text-center">Vanila</span><span class="absolute -top-6 text-sm font-bold w-full text-center text-gray-500">6</span></div><div class="bg-yellow-700 w-12 h-28 rounded-t-md relative shadow-sm"><span class="absolute -bottom-6 text-sm font-bold w-full text-center">Coklat</span><span class="absolute -top-6 text-sm font-bold w-full text-center text-gray-500">8</span></div></div><div class="h-6"></div>`;
+                dbQs['s2_6_1'][9].visual = `<div class="text-5xl font-bold tracking-widest text-gray-700 my-4 text-center">|||| \\ &nbsp; |||</div>`;
+            }
+
+            // Visual tambahan untuk soalan ukuran
+            if(dbQs['s2_4_1']) { dbQs['s2_4_1'][2].visual = visualHelper.ruler(); dbQs['s2_4_1'][5].visual = visualHelper.ruler(); }
+            if(dbQs['s2_4_2']) { dbQs['s2_4_2'][5].visual = visualHelper.scale(); dbQs['s2_4_2'][9].visual = visualHelper.scale(); }
+            if(dbQs['s2_4_3']) { dbQs['s2_4_3'][6].visual = visualHelper.beaker(); dbQs['s2_4_3'][7].visual = visualHelper.beaker(); }
+            
+            // Visual pembaikan pepijat untuk soalan KBAT (Penyelesaian Masalah) - guna icon simbolik besar berbanding kumpulan yg tidak mencukupi
+            if(dbQsKb['s1_2_1']) {
+                dbQsKb['s1_2_1'][0].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">🧺 🍎🍏</div>`; // bakul epal
+                dbQsKb['s1_2_1'][1].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">👦🏻 🏷️</div>`; // pelekat
+            }
+            if(dbQsKb['s1_2_3']) {
+                dbQsKb['s1_2_3'][0].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">🚗🚗🚗🚗🚗</div>`; // 5 kereta
+                dbQsKb['s1_2_3'][1].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">✏️✏️✏️</div>`; // 3 kotak pensel
+            }
+            if(dbQsKb['s1_2_4']) {
+                dbQsKb['s1_2_4'][0].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">🏫 👨‍🎓👩‍🎓</div>`; // murid
+                dbQsKb['s1_2_4'][2].visual = `<div class="text-6xl text-center my-4 drop-shadow-md">🫙🫙🫙</div>`; // 3 balang
+            }
+            if(dbQsKb['s2_1_1']) {
+                dbQsKb['s2_1_1'][0].visual = visualHelper.fraction(1, 4);
+                dbQsKb['s2_1_1'][1].visual = visualHelper.fraction(3, 10);
+                dbQsKb['s2_1_1'][2].visual = visualHelper.fraction(1, 2);
+            }
+        }
+        addVisualsToDB();
+
+        const mathEngine = {
+            rnd: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+            genOpts: (ans, isMoney = false) => {
+                let opts = [ans];
+                while(opts.length < 4) {
+                    let w;
+                    if(typeof ans === 'number') {
+                        let varAmt = Math.max(2, Math.floor(ans * 0.1));
+                        w = ans + (Math.random() > 0.5 ? 1 : -1) * mathEngine.rnd(1, varAmt + 3);
+                        if (w < 0) w = Math.abs(w) + 1;
+                    } else if (isMoney) { 
+                        let val = parseFloat(ans.replace('RM ', ''));
+                        let wVal = val + (Math.random() > 0.5 ? 1 : -1) * (mathEngine.rnd(1, 5) * 0.5);
+                        if(wVal < 0) wVal = val + 1.5;
+                        w = `RM ${wVal.toFixed(2)}`;
+                    } else { 
+                        w = ans + " (Salah)"; 
+                    }
+                    if(!opts.includes(w)) opts.push(w);
+                }
+                return opts.sort(() => Math.random() - 0.5);
+            },
+            
+            genTambah: () => {
+                let a = mathEngine.rnd(100, 450);
+                let b = mathEngine.rnd(50, 450);
+                let ans = a + b;
+                return { q: `${a} + ${b} = ?`, a: ans.toString(), opts: mathEngine.genOpts(ans).map(String) };
+            },
+            genTolak: () => {
+                let a = mathEngine.rnd(300, 900);
+                let b = mathEngine.rnd(50, a - 10);
+                let ans = a - b;
+                return { q: `${a} - ${b} = ?`, a: ans.toString(), opts: mathEngine.genOpts(ans).map(String) };
+            },
+            genDarab: () => {
+                let sifir = mathEngine.rnd(2, 5);
+                if(Math.random() > 0.8) sifir = 10;
+                let b = mathEngine.rnd(2, 9);
+                let ans = sifir * b;
+                let emojis = ['🍎','🍩','⚽','⭐','🎈'];
+                let em = emojis[mathEngine.rnd(0, emojis.length-1)];
+                let v = (sifir <= 5 && b <= 6) ? visualHelper.groups(b, sifir, em) : null;
+                return { q: `${b} x ${sifir} = ?`, a: ans.toString(), opts: mathEngine.genOpts(ans).map(String), visual: v };
+            },
+            genBahagi: () => {
+                let b = mathEngine.rnd(2, 5);
+                if(Math.random() > 0.8) b = 10;
+                let ans = mathEngine.rnd(2, 9);
+                let a = b * ans;
+                let emojis = ['🍪','🍬','🍓','🍕'];
+                let em = emojis[mathEngine.rnd(0, emojis.length-1)];
+                let v = (b <= 5 && ans <= 5) ? visualHelper.groups(ans, b, em) : null;
+                return { q: `${a} ÷ ${b} = ?`, a: ans.toString(), opts: mathEngine.genOpts(ans).map(String), visual: v };
+            },
+            genWangTambahTolak: () => {
+                let isTambah = Math.random() > 0.5;
+                let r1 = mathEngine.rnd(10, 50);
+                let r2 = mathEngine.rnd(5, 30);
+                if(!isTambah && r1 < r2) { let temp=r1; r1=r2; r2=temp; }
+                let ans = isTambah ? r1+r2 : r1-r2;
+                let op = isTambah ? '+' : '-';
+                let ansStr = `RM ${ans}.00`;
+                let visual = `<div class="text-6xl text-center my-4 drop-shadow-md">💵 🪙</div>`;
+                return { q: `RM ${r1}.00 ${op} RM ${r2}.00 = ?`, a: ansStr, opts: mathEngine.genOpts(ansStr, true), visual: visual };
+            },
+            genWangDarabBahagi: () => {
+                let isDarab = Math.random() > 0.5;
+                let visual = `<div class="text-6xl text-center my-4 drop-shadow-md">💳 💰</div>`;
+                if(isDarab) {
+                    let r = mathEngine.rnd(2, 10);
+                    let s = mathEngine.rnd(2, 5);
+                    let ansStr = `RM ${(r*s)}.00`;
+                    return { q: `RM ${r}.00 x ${s} = ?`, a: ansStr, opts: mathEngine.genOpts(ansStr, true), visual: visual };
+                } else {
+                    let s = mathEngine.rnd(2, 5);
+                    let ans = mathEngine.rnd(2, 10);
+                    let r = s * ans;
+                    let ansStr = `RM ${ans}.00`;
+                    return { q: `RM ${r}.00 ÷ ${s} = ?`, a: ansStr, opts: mathEngine.genOpts(ansStr, true), visual: visual };
+                }
+            }
+        };
+
+        const quizLogic = {
+            getQuestionsForSubtopic: function(subId) {
+                let qs = [];
+                let kbQs = [];
+                
+                // Ambil soalan KBAT (jika wujud)
+                if (dbQsKb && dbQsKb[subId]) {
+                    kbQs = dbQsKb[subId].map(item => ({
+                        q: item.q, a: item.a, visual: item.visual, opts: [...item.opts].sort(() => Math.random() - 0.5)
+                    }));
+                }
+
+                // Kira berapa soalan biasa diperlukan untuk mencukupkan tepat 10
+                let normalCount = 10 - kbQs.length;
+
+                // Jika topik ini mempunyai set hardcoded di dalam dbQs
+                if (dbQs[subId]) {
+                    let shuffledDb = [...dbQs[subId]].sort(() => Math.random() - 0.5);
+                    qs = shuffledDb.slice(0, normalCount).map(item => ({
+                        q: item.q, a: item.a, visual: item.visual, opts: [...item.opts].sort(() => Math.random() - 0.5)
+                    }));
+                } else {
+                    // Jika tiada hardcoded (untuk operasi asas), kita jana procedural
+                    for(let i=0; i<normalCount; i++) {
+                        if (subId === 's1_2_1') qs.push(mathEngine.genTambah());
+                        else if (subId === 's1_2_2') qs.push(mathEngine.genTolak());
+                        else if (subId === 's1_2_3') qs.push(mathEngine.genDarab());
+                        else if (subId === 's1_2_4') qs.push(mathEngine.genBahagi());
+                        else if (subId === 's2_2_1') qs.push(mathEngine.genWangTambahTolak());
+                        else if (subId === 's2_2_2') qs.push(mathEngine.genWangDarabBahagi());
+                        else qs.push(mathEngine.genTambah());
+                    }
+                }
+
+                // Cantumkan normal + KBAT, pulangkan TEPAT 10 SOALAN
+                return qs.concat(kbQs);
+            },
+
+            getExamSet: function(setNum) {
+                let qs = [];
+                
+                // 10 Conceptual from Vol 1
+                for(let i=1; i<=4; i++) {
+                    let subQs = dbQs[`s1_1_${i}`];
+                    qs.push(subQs[mathEngine.rnd(0, subQs.length-1)]);
+                    if(i<3) qs.push(subQs[mathEngine.rnd(0, subQs.length-1)]);
+                }
+                // 12 Arithmetic
+                for(let i=0; i<3; i++) qs.push(mathEngine.genTambah());
+                for(let i=0; i<3; i++) qs.push(mathEngine.genTolak());
+                for(let i=0; i<2; i++) qs.push(mathEngine.genDarab());
+                for(let i=0; i<2; i++) qs.push(mathEngine.genBahagi());
+                qs.push(mathEngine.genWangTambahTolak());
+                qs.push(mathEngine.genWangDarabBahagi());
+                
+                // 12 Conceptual from Vol 2 + KBAT
+                let v2Topics = ['s2_1_1', 's2_1_2', 's2_3_1', 's2_3_2', 's2_4_1', 's2_4_2', 's2_4_3', 's2_5_1', 's2_5_2', 's2_6_1'];
+                v2Topics.forEach(t => {
+                    let subQs = dbQs[t];
+                    qs.push(subQs[mathEngine.rnd(0, subQs.length-1)]);
+                    if (dbQsKb[t] && Math.random() > 0.5) qs.push(dbQsKb[t][mathEngine.rnd(0, dbQsKb[t].length-1)]);
+                });
+                
+                // Since operations are random and we shuffle, Set 1 and Set 2 will always be unique!
+                let finalSet = qs.sort(() => Math.random() - 0.5).slice(0, 30);
+                
+                return finalSet.map(item => ({
+                    q: item.q, a: item.a, visual: item.visual, opts: [...item.opts].sort(() => Math.random() - 0.5)
+                }));
+            }
+        };
+
+        const ui = {
+            hideAll: () => {
+                ['screen-main', 'screen-topics', 'screen-quiz', 'screen-result'].forEach(id => {
+                    document.getElementById(id).classList.add('hide');
+                });
+            },
+            showModal: (title, msg, actionsHtml) => {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-msg').innerHTML = msg;
+                document.getElementById('modal-actions').innerHTML = actionsHtml;
+                document.getElementById('custom-modal').classList.remove('hide');
+            },
+            hideModal: () => {
+                document.getElementById('custom-modal').classList.add('hide');
+            }
+        };
+
+        const nav = {
+            goHome: () => {
+                ui.hideAll();
+                document.getElementById('screen-main').classList.remove('hide');
+                if (window.gameTimer) clearInterval(window.gameTimer);
+            },
+            showVolume: (vol) => {
+                appState.currentVolume = vol;
+                ui.hideAll();
+                const container = document.getElementById('topics-container');
+                container.innerHTML = '';
+                document.getElementById('volume-title').textContent = `Topik Buku Jilid ${vol}`;
+
+                curriculum[vol].forEach(topic => {
+                    const topicDiv = document.createElement('div');
+                    topicDiv.className = 'bg-white rounded-3xl shadow-md border-2 border-indigo-50 overflow-hidden';
+                    
+                    const topicHeader = document.createElement('div');
+                    topicHeader.className = 'bg-indigo-100 p-4 px-6 font-bold text-indigo-900 text-lg md:text-xl border-b-4 border-indigo-200';
+                    topicHeader.textContent = topic.title;
+                    topicDiv.appendChild(topicHeader);
+
+                    const subContainer = document.createElement('div');
+                    subContainer.className = 'p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50';
+                    
+                    topic.subtopics.forEach(sub => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-pop text-left bg-white border-2 border-gray-200 hover:border-green-500 hover:bg-green-50 p-4 rounded-2xl text-base font-bold text-gray-700 shadow-sm flex justify-between items-center group';
+                        
+                        const isDone = appState.progress.topicsCompleted[sub.id];
+                        btn.innerHTML = `
+                            <span class="pr-2 leading-tight group-hover:text-green-700 transition-colors">${sub.title}</span> 
+                            <span class="text-2xl">${isDone ? '✅' : '▶️'}</span>
+                        `;
+                        
+                        btn.onclick = () => quizApp.startSubtopic(topic.id, sub.id, sub.title);
+                        subContainer.appendChild(btn);
+                    });
+                    
+                    topicDiv.appendChild(subContainer);
+                    container.appendChild(topicDiv);
+                });
+                
+                document.getElementById('screen-topics').classList.remove('hide');
+            },
+            showExams: () => {
+                ui.showModal('Pilih Set Peperiksaan', 'Setiap set mengandungi <b>30 soalan</b> berbeza dari bab Jilid 1 dan 2.', `
+                    <button onclick="ui.hideModal(); quizApp.startExam(1)" class="btn-pop bg-purple-500 text-white px-4 py-3 rounded-xl font-bold w-full mb-3 shadow-md">Mula Peperiksaan Set 1</button>
+                    <button onclick="ui.hideModal(); quizApp.startExam(2)" class="btn-pop bg-indigo-500 text-white px-4 py-3 rounded-xl font-bold w-full mb-3 shadow-md">Mula Peperiksaan Set 2</button>
+                    <button onclick="ui.hideModal()" class="btn-pop bg-gray-200 text-gray-700 px-4 py-3 rounded-xl font-bold w-full border border-gray-300">Kembali</button>
+                `);
+            },
+            showGames: () => {
+                ui.showModal('Zon Permainan Matematik', 'Mari uji kepantasan anda mencongak operasi asas! Jawab sebanyak mungkin dalam masa 30 saat.', `
+                    <button onclick="ui.hideModal(); gameApp.start()" class="btn-pop bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-3 rounded-xl font-bold text-lg w-full mb-3 shadow-md">Mula Cabaran Masa ⏱️</button>
+                    <button onclick="ui.hideModal()" class="btn-pop bg-gray-200 text-gray-700 px-4 py-3 rounded-xl font-bold w-full border border-gray-300">Kembali</button>
+                `);
+            },
+            showProgress: () => {
+                const total = appState.progress.totalScore || 0;
+                const completed = Object.keys(appState.progress.topicsCompleted).length;
+                ui.showModal('🏆 Rekod Pencapaian', `
+                    <div class="bg-green-50 p-4 rounded-xl mt-4 border border-green-200">
+                        <p class="text-sm text-green-700 mb-1">Jumlah Markah Terkumpul</p>
+                        <p class="text-4xl font-kids font-bold text-green-800">${total}</p>
+                    </div>
+                    <div class="bg-blue-50 p-4 rounded-xl mt-3 border border-blue-200 mb-4">
+                        <p class="text-sm text-blue-700 mb-1">Subtopik Diselesaikan</p>
+                        <p class="text-2xl font-kids font-bold text-blue-800">${completed} / 20</p>
+                    </div>
+                `, `<button onclick="ui.hideModal()" class="btn-pop bg-green-500 text-white px-6 py-3 rounded-xl font-bold w-full shadow-md">Teruskan Belajar!</button>`);
+            }
+        };
+
+        const canvasApp = {
+            canvas: null, ctx: null, isDrawing: false, currentTool: 'pen', lastX: 0, lastY: 0,
+            
+            init: function() {
+                this.canvas = document.getElementById('drawing-canvas');
+                this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
+                
+                this.resize();
+                window.addEventListener('resize', () => {
+                    if(!document.getElementById('screen-quiz').classList.contains('hide')) this.resize();
+                });
+
+                this.canvas.addEventListener('mousedown', this.startDrawing.bind(this));
+                this.canvas.addEventListener('mousemove', this.draw.bind(this));
+                this.canvas.addEventListener('mouseup', this.stopDrawing.bind(this));
+                this.canvas.addEventListener('mouseout', this.stopDrawing.bind(this));
+
+                this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.startDrawing(e.touches[0]); }, {passive: false});
+                this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.draw(e.touches[0]); }, {passive: false});
+                this.canvas.addEventListener('touchend', this.stopDrawing.bind(this));
+                
+                this.setTool('pen');
+            },
+            resize: function() {
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = this.canvas.width; tempCanvas.height = this.canvas.height;
+                if(this.canvas.width > 0) tempCanvas.getContext('2d').drawImage(this.canvas, 0, 0);
+
+                this.canvas.width = rect.width;
+                this.canvas.height = 200; // Fixed 200px compact
+                
+                this.ctx.drawImage(tempCanvas, 0, 0);
+                this.setTool(this.currentTool); 
+            },
+            getPos: function(evt) {
+                const rect = this.canvas.getBoundingClientRect();
+                return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+            },
+            startDrawing: function(e) {
+                this.isDrawing = true;
+                const pos = this.getPos(e);
+                this.lastX = pos.x; this.lastY = pos.y;
+            },
+            draw: function(e) {
+                if (!this.isDrawing) return;
+                const pos = this.getPos(e);
+                
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.lastX, this.lastY);
+                this.ctx.lineTo(pos.x, pos.y);
+                this.ctx.stroke();
+                
+                this.lastX = pos.x; this.lastY = pos.y;
+            },
+            stopDrawing: function() {
+                this.isDrawing = false;
+                this.ctx.beginPath();
+            },
+            setTool: function(tool) {
+                this.currentTool = tool;
+                const btnPen = document.getElementById('tool-pen');
+                const btnEraser = document.getElementById('tool-eraser');
+                
+                if (tool === 'pen') {
+                    this.ctx.strokeStyle = '#1E3A8A';
+                    this.ctx.lineWidth = 3;
+                    this.ctx.globalCompositeOperation = 'source-over';
+                    btnPen.className = 'btn-pop bg-blue-500 text-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-semibold';
+                    btnEraser.className = 'btn-pop bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-semibold';
+                } else {
+                    this.ctx.lineWidth = 25; 
+                    this.ctx.globalCompositeOperation = 'destination-out';
+                    btnEraser.className = 'btn-pop bg-blue-500 text-white px-3 py-1.5 rounded-lg shadow-sm text-sm font-semibold';
+                    btnPen.className = 'btn-pop bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-lg text-sm font-semibold';
+                }
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+            },
+            clearCanvas: function() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        };
+
+        const quizApp = {
+            startSubtopic: function(topicId, subId, title) {
+                appState.mode = 'quiz';
+                appState.currentTopicId = topicId;
+                appState.currentSubtopicId = subId;
+                appState.questions = quizLogic.getQuestionsForSubtopic(subId);
+                appState.currentIndex = 0;
+                appState.score = 0;
+                
+                document.getElementById('quiz-title').textContent = title;
+                document.getElementById('canvas-section').classList.remove('hide');
+                
+                ui.hideAll();
+                document.getElementById('screen-quiz').classList.remove('hide');
+                
+                setTimeout(() => canvasApp.resize(), 100);
+                this.renderQuestion();
+            },
+
+            startExam: function(setNum) {
+                appState.mode = 'exam';
+                appState.questions = quizLogic.getExamSet(setNum);
+                appState.currentIndex = 0;
+                appState.score = 0;
+                appState.userAnswers = new Array(30).fill(null);
+                
+                document.getElementById('quiz-title').textContent = `Peperiksaan Set ${setNum} (30 Soalan)`;
+                document.getElementById('canvas-section').classList.remove('hide');
+
+                ui.hideAll();
+                document.getElementById('screen-quiz').classList.remove('hide');
+                
+                setTimeout(() => canvasApp.resize(), 100);
+                this.renderQuestion();
+            },
+
+            renderQuestion: function() {
+                const q = appState.questions[appState.currentIndex];
+                const total = appState.questions.length;
+                
+                document.getElementById('quiz-progress').textContent = `Soalan ${appState.currentIndex + 1} / ${total}`;
+                
+                let qText = q.q.replace(/(\d+)\/(\d+)/g, '<span class="fraction"><span>$1</span><span>$2</span></span>');
+                let visualHtml = q.visual ? `<div class="w-full mt-4 mb-2 flex justify-center">${q.visual}</div>` : '';
+                
+                document.getElementById('question-text').innerHTML = qText + visualHtml;
+                
+                const optsContainer = document.getElementById('answer-options');
+                optsContainer.innerHTML = '';
+                
+                const feedback = document.getElementById('feedback-msg');
+                feedback.textContent = '';
+                feedback.className = 'text-lg md:text-xl font-bold px-4 py-2 rounded-xl';
+                
+                document.getElementById('btn-next').classList.add('hide');
+                document.getElementById('btn-submit-exam').classList.add('hide');
+                
+                canvasApp.clearCanvas(); 
+
+                q.opts.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-pop bg-white border-4 border-gray-200 hover:border-blue-500 hover:bg-blue-50 p-5 rounded-2xl text-xl md:text-2xl font-bold text-gray-700 transition-colors shadow-sm';
+                    
+                    btn.innerHTML = opt.replace(/(\d+)\/(\d+)/g, '<span class="fraction"><span>$1</span><span>$2</span></span>');
+                    
+                    if(appState.mode === 'quiz') {
+                        btn.onclick = () => this.checkAnswer(opt, btn);
+                    } else {
+                        if(appState.userAnswers[appState.currentIndex] === opt) {
+                            btn.classList.replace('border-gray-200', 'border-purple-500');
+                            btn.classList.add('bg-purple-50', 'text-purple-700');
+                        }
+                        btn.onclick = () => {
+                            Array.from(optsContainer.children).forEach(c => {
+                                c.classList.replace('border-purple-500', 'border-gray-200');
+                                c.classList.remove('bg-purple-50', 'text-purple-700');
+                            });
+                            btn.classList.replace('border-gray-200', 'border-purple-500');
+                            btn.classList.add('bg-purple-50', 'text-purple-700');
+                            appState.userAnswers[appState.currentIndex] = opt;
+                            
+                            if (appState.currentIndex < total - 1) {
+                                document.getElementById('btn-next').classList.remove('hide');
+                            } else {
+                                document.getElementById('btn-submit-exam').classList.remove('hide');
+                            }
+                        };
+                    }
+                    optsContainer.appendChild(btn);
+                });
+                
+                if (appState.mode === 'exam' && appState.currentIndex < total - 1) {
+                    document.getElementById('btn-next').classList.remove('hide');
+                    document.getElementById('btn-next').textContent = "Seterusnya ➡️";
+                }
+            },
+
+            checkAnswer: function(selected, btnElement) {
+                const q = appState.questions[appState.currentIndex];
+                const optsContainer = document.getElementById('answer-options');
+                const feedback = document.getElementById('feedback-msg');
+                
+                Array.from(optsContainer.children).forEach(btn => btn.disabled = true);
+                
+                if(selected === q.a) {
+                    btnElement.classList.replace('border-gray-200', 'border-green-500');
+                    btnElement.classList.replace('hover:border-blue-500', 'border-green-500');
+                    btnElement.classList.add('bg-green-100', 'text-green-700');
+                    feedback.innerHTML = '✅ <span class="text-green-700">Tepat Sekali!</span>';
+                    feedback.classList.add('bg-green-100', 'border-2', 'border-green-300');
+                    appState.score++;
+                } else {
+                    btnElement.classList.replace('border-gray-200', 'border-red-500');
+                    btnElement.classList.add('bg-red-50', 'text-red-700');
+                    
+                    let aText = q.a.replace(/(\d+)\/(\d+)/g, '<span class="fraction"><span>$1</span><span>$2</span></span>');
+                    feedback.innerHTML = `❌ <span class="text-red-700">Jawapan betul: ${aText}</span>`;
+                    feedback.classList.add('bg-red-100', 'border-2', 'border-red-300');
+                    
+                    Array.from(optsContainer.children).forEach(btn => {
+                        if(btn.innerHTML.includes(q.a) || btn.textContent === q.a) {
+                            btn.classList.replace('border-gray-200', 'border-green-500');
+                            btn.classList.add('bg-green-50');
+                        }
+                    });
+                }
+                
+                const nextBtn = document.getElementById('btn-next');
+                nextBtn.classList.remove('hide');
+                if (appState.currentIndex === appState.questions.length - 1) {
+                    nextBtn.textContent = "Lihat Keputusan 🏆";
+                } else {
+                    nextBtn.textContent = "Seterusnya ➡️";
+                }
+            },
+
+            nextQuestion: function() {
+                if (appState.currentIndex < appState.questions.length - 1) {
+                    appState.currentIndex++;
+                    this.renderQuestion();
+                } else {
+                    this.finishQuiz();
+                }
+            },
+
+            finishQuiz: function() {
+                ui.hideAll();
+                let finalScore = appState.score;
+                let total = appState.questions.length;
+                
+                if (appState.mode === 'exam') {
+                    finalScore = 0;
+                    appState.userAnswers.forEach((ans, idx) => {
+                        if (ans === appState.questions[idx].a) finalScore++;
+                    });
+                }
+                
+                const percent = Math.round((finalScore / total) * 100);
+                document.getElementById('result-score').textContent = `${finalScore}/${total}`;
+                document.getElementById('result-percent').textContent = `${percent}% Markah`;
+                
+                let desc = "Kekalkan usaha anda!";
+                if(percent === 100) desc = "Cemerlang! Prestasi yang sangat hebat!";
+                else if(percent >= 80) desc = "Syabas! Anda menguasai topik ini dengan baik.";
+                else if(percent < 50) desc = "Jangan putus asa, mari cuba lagi!";
+                document.getElementById('result-desc').textContent = desc;
+                
+                if (appState.mode === 'quiz') {
+                    appState.progress.totalScore += finalScore;
+                    if(percent >= 80) {
+                        appState.progress.topicsCompleted[appState.currentSubtopicId] = true;
+                    }
+                    localStorage.setItem('mathT2_progress_v3', JSON.stringify(appState.progress));
+                }
+                
+                document.getElementById('screen-result').classList.remove('hide');
+            },
+
+            confirmExit: function() {
+                ui.showModal('Keluar Latihan', 'Adakah anda pasti mahu keluar? Rekod jalan kira semasa tidak akan disimpan.', `
+                    <button onclick="ui.hideModal(); nav.goHome()" class="btn-pop bg-red-500 text-white px-4 py-3 rounded-xl font-bold w-full mb-2 shadow-sm">Ya, Keluar</button>
+                    <button onclick="ui.hideModal()" class="btn-pop bg-gray-200 text-gray-700 px-4 py-3 rounded-xl font-bold w-full border border-gray-300">Batal</button>
+                `);
+            }
+        };
+
+        const gameApp = {
+            score: 0,
+            timeLeft: 30,
+            
+            start: function() {
+                appState.mode = 'game';
+                this.score = 0;
+                this.timeLeft = 30;
+                
+                ui.hideAll();
+                document.getElementById('screen-quiz').classList.remove('hide');
+                
+                document.getElementById('quiz-title').innerHTML = `⏱️ Masa: <span id="game-time" class="text-red-500">30s</span>`;
+                document.getElementById('quiz-progress').innerHTML = `⭐ Markah: <span id="game-score">0</span>`;
+                document.getElementById('feedback-msg').textContent = "";
+                document.getElementById('btn-next').classList.add('hide');
+                document.getElementById('canvas-section').classList.add('hide'); 
+                
+                this.nextRound();
+                
+                window.gameTimer = setInterval(() => {
+                    this.timeLeft--;
+                    document.getElementById('game-time').textContent = `${this.timeLeft}s`;
+                    if(this.timeLeft <= 0) this.endGame();
+                }, 1000);
+            },
+            
+            nextRound: function() {
+                const isAdd = Math.random() > 0.5;
+                const a = mathEngine.rnd(1, 20);
+                const b = mathEngine.rnd(1, 10);
+                const ans = isAdd ? a+b : (a>b ? a-b : b-a);
+                const op = isAdd ? '+' : '-';
+                
+                const qText = a>b&&!isAdd ? `${a} - ${b}` : `${isAdd?a:b} ${op} ${isAdd?b:a}`;
+                
+                document.getElementById('question-text').innerHTML = `<div class="text-center text-4xl py-8">${qText} = ?</div>`;
+                
+                const optsContainer = document.getElementById('answer-options');
+                optsContainer.innerHTML = '';
+                
+                let opts = mathEngine.genOpts(ans);
+                opts.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-pop bg-yellow-100 border-4 border-yellow-400 p-6 rounded-3xl text-3xl font-bold text-yellow-800 shadow-md active:bg-yellow-300';
+                    btn.textContent = opt;
+                    btn.onclick = () => {
+                        if(opt == ans) {
+                            this.score += 10;
+                            document.getElementById('game-score').textContent = this.score;
+                            this.timeLeft += 2; 
+                            this.nextRound();
+                        } else {
+                            btn.classList.replace('bg-yellow-100', 'bg-red-200');
+                            btn.classList.replace('border-yellow-400', 'border-red-500');
+                            this.timeLeft -= 3; 
+                            setTimeout(() => {
+                                btn.classList.replace('bg-red-200', 'bg-yellow-100');
+                                btn.classList.replace('border-red-500', 'border-yellow-400');
+                            }, 300);
+                        }
+                    };
+                    optsContainer.appendChild(btn);
+                });
+            },
+            
+            endGame: function() {
+                clearInterval(window.gameTimer);
+                ui.hideAll();
+                document.getElementById('screen-result').classList.remove('hide');
+                document.getElementById('result-desc').textContent = "Masa tamat! Anda hebat mencuba cabaran ini.";
+                document.getElementById('result-score').textContent = this.score;
+                document.getElementById('result-percent').textContent = "Mata Dikumpul";
+                
+                appState.progress.totalScore += this.score;
+                localStorage.setItem('mathT2_progress_v3', JSON.stringify(appState.progress));
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-next').addEventListener('click', () => quizApp.nextQuestion());
+            document.getElementById('btn-submit-exam').addEventListener('click', () => quizApp.finishQuiz());
+            canvasApp.init();
+            nav.goHome(); 
+        });
+    </script>
+</body>
+</html>
